@@ -1,7 +1,7 @@
 
 
 #I imported all the necessary package to predect the manner the group of people did the excercice.
-'''
+```{r}
 rm(list=ls())
 library(knitr)
 library(caret)
@@ -11,8 +11,9 @@ library(rattle)
 library(randomForest)
 library(corrplot)
 set.seed(12345)
-'''
+```
 #Then I uploaded data to my rstudio 
+```{r}
 UrlTrain <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
 UrlTest  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 training<-read.csv(url(UrlTrain))
@@ -27,8 +28,10 @@ TrainSet<- TrainSet[,-NZV]
 TestSet<-TestSet[,-NZV]
 dim(TrainSet)
 dim(TestSet)
+```
 # The data seems hasa large number of columns in the dataset, I checked if there are missing data in it.Then,
 I cleaned th data and saw how variables are correlated between each other.
+```{r}
 AllNA<- sapply(TrainSet,function(x)mean(is.na(x)))> 0.95
 ALLNA
 TrainSet<-TrainSet[,AllNA==FALSE]
@@ -41,8 +44,10 @@ dim(TrainSet)
 dim(TestSet)
 corrMatrix<- cor(TrainSet[,-54])
 corrplot(corrMatrix,order="FPC",method="color", type="lower",tl.cex=0.8,tl.col=rgb(0,0,0))
+```
 #I will use prediction models now with three methods and the one with higher accurancy will be the chosen one.In order to visualise the accurancy I will use a plot of the confusion matrix
 #RANDOM FOREST MODEL
+```{r}
 set.seed(12345)
 tcontrolRF<- trainControl(method = "cv", number = 3,verboseIter = FALSE)
 modFitRandForest<- train(classe~ ., data=TrainSet,method="rf",trControl=tcontrolRF )
@@ -51,8 +56,10 @@ predictRandForest <- predict(modFitRandForest, newdata=TestSet)
 predictRandForest
 confMatRandForest <- confusionMatrix(predictRandForest, TestSet$classe)
 confMatRandForest
+```
 # The accurancy here is 0.9964 .
 # method2: decision tree
+```{r}
 set.seed(32165)
 modFitDecTree <- rpart(classe ~ ., data=TrainSet, method="class")
 fancyRpartPlot(modFitDecTree)
@@ -63,8 +70,10 @@ confMatDecTree
 plot(confMatDecTree$table, col = confMatDecTree$byClass, 
      main = paste("Decision Tree - Accuracy =",
                   round(confMatDecTree$overall['Accuracy'], 4)))
+		  ```
 # The accurancy here is  0.7368 .
 # method3 :Genereliized Boosted Model
+```{r}
 set.seed(32165)
 controlGBM <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
 modFitGBM  <- train(classe ~ ., data=TrainSet, method = "gbm",
@@ -76,5 +85,6 @@ confMatGBM <- confusionMatrix(predictGBM, TestSet$classe)
 confMatGBM
 plot(confMatGBM$table, col = confMatGBM$byClass, 
      main = paste("GBM - Accuracy =", round(confMatGBM$overall['Accuracy'], 4)))
+     ```
 		 # The accurancy here is  0.9854 .
  So I chose the first model using random forest model which has the higher accurancy with value of 0.9964

@@ -1,1 +1,418 @@
 
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls())
+> library(knitr)
+Warning message:
+le package ‘knitr’ a été compilé avec la version R 3.3.3 
+> library(caret)
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : ggplot2
+Warning messages:
+1: le package ‘caret’ a été compilé avec la version R 3.3.3 
+2: le package ‘ggplot2’ a été compilé avec la version R 3.3.3 
+> library(rpart)
+Warning message:
+le package ‘rpart’ a été compilé avec la version R 3.3.3 
+> library(rpart.plot)
+Warning message:
+le package ‘rpart.plot’ a été compilé avec la version R 3.3.3 
+> library(rattle)
+Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  aucun package nommé ‘RGtk2’ n'est trouvé
+In addition: Warning message:
+le package ‘rattle’ a été compilé avec la version R 3.3.3 
+Error: le chargement du package ou de l'espace de noms a échoué pour ‘rattle’
+> library(randomForest)
+randomForest 4.6-12
+Type rfNews() to see new features/changes/bug fixes.
+
+Attachement du package : ‘randomForest’
+
+The following object is masked from ‘package:ggplot2’:
+
+    margin
+
+Warning message:
+le package ‘randomForest’ a été compilé avec la version R 3.3.3 
+> library(corrplot)
+Warning message:
+le package ‘corrplot’ a été compilé avec la version R 3.3.3 
+> set.seed(12345)
+> UrlTrain <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+> UrlTest  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+> training<-read.csv(url(UrlTrain))
+> testing<- read.csv(url(UrlTest))
+> inTrain <- createDataPartition(training$classe, p = 0.7, list = FALSE)
+> TrainSet<-training[inTrain,]
+> TestSet<-training[-inTrain,]
+> dim(TrainSet)
+[1] 13737   160
+> dim(TestSet)
+[1] 5885  160
+> NZV<- nearZeroVar(TrainSet)
+> TrainSet<- TrainSet[,-NZV]
+> TestSet<-TestSet[,-NZV]
+> dim(TrainSet)
+[1] 13737   106
+> dim(TestSet)
+[1] 5885  106
+> AllNA<- sapply(TrainSet,function(x)mean(is.na(x)))> 0.95
+> AllNA
+                       X                user_name 
+                   FALSE                    FALSE 
+    raw_timestamp_part_1     raw_timestamp_part_2 
+                   FALSE                    FALSE 
+          cvtd_timestamp               num_window 
+                   FALSE                    FALSE 
+               roll_belt               pitch_belt 
+                   FALSE                    FALSE 
+                yaw_belt         total_accel_belt 
+                   FALSE                    FALSE 
+           max_roll_belt           max_picth_belt 
+                    TRUE                     TRUE 
+           min_roll_belt           min_pitch_belt 
+                    TRUE                     TRUE 
+     amplitude_roll_belt     amplitude_pitch_belt 
+                    TRUE                     TRUE 
+    var_total_accel_belt            avg_roll_belt 
+                    TRUE                     TRUE 
+        stddev_roll_belt            var_roll_belt 
+                    TRUE                     TRUE 
+          avg_pitch_belt        stddev_pitch_belt 
+                    TRUE                     TRUE 
+          var_pitch_belt             avg_yaw_belt 
+                    TRUE                     TRUE 
+         stddev_yaw_belt             var_yaw_belt 
+                    TRUE                     TRUE 
+            gyros_belt_x             gyros_belt_y 
+                   FALSE                    FALSE 
+            gyros_belt_z             accel_belt_x 
+                   FALSE                    FALSE 
+            accel_belt_y             accel_belt_z 
+                   FALSE                    FALSE 
+           magnet_belt_x            magnet_belt_y 
+                   FALSE                    FALSE 
+           magnet_belt_z                 roll_arm 
+                   FALSE                    FALSE 
+               pitch_arm                  yaw_arm 
+                   FALSE                    FALSE 
+         total_accel_arm            var_accel_arm 
+                   FALSE                     TRUE 
+             gyros_arm_x              gyros_arm_y 
+                   FALSE                    FALSE 
+             gyros_arm_z              accel_arm_x 
+                   FALSE                    FALSE 
+             accel_arm_y              accel_arm_z 
+                   FALSE                    FALSE 
+            magnet_arm_x             magnet_arm_y 
+                   FALSE                    FALSE 
+            magnet_arm_z             max_roll_arm 
+                   FALSE                     TRUE 
+           max_picth_arm              max_yaw_arm 
+                    TRUE                     TRUE 
+            min_roll_arm            min_pitch_arm 
+                    TRUE                     TRUE 
+             min_yaw_arm       amplitude_roll_arm 
+                    TRUE                     TRUE 
+     amplitude_pitch_arm        amplitude_yaw_arm 
+                    TRUE                     TRUE 
+           roll_dumbbell           pitch_dumbbell 
+                   FALSE                    FALSE 
+            yaw_dumbbell        max_roll_dumbbell 
+                   FALSE                     TRUE 
+      max_picth_dumbbell        min_roll_dumbbell 
+                    TRUE                     TRUE 
+      min_pitch_dumbbell  amplitude_roll_dumbbell 
+                    TRUE                     TRUE 
+amplitude_pitch_dumbbell     total_accel_dumbbell 
+                    TRUE                    FALSE 
+      var_accel_dumbbell        avg_roll_dumbbell 
+                    TRUE                     TRUE 
+    stddev_roll_dumbbell        var_roll_dumbbell 
+                    TRUE                     TRUE 
+      avg_pitch_dumbbell    stddev_pitch_dumbbell 
+                    TRUE                     TRUE 
+      var_pitch_dumbbell         avg_yaw_dumbbell 
+                    TRUE                     TRUE 
+     stddev_yaw_dumbbell         var_yaw_dumbbell 
+                    TRUE                     TRUE 
+        gyros_dumbbell_x         gyros_dumbbell_y 
+                   FALSE                    FALSE 
+        gyros_dumbbell_z         accel_dumbbell_x 
+                   FALSE                    FALSE 
+        accel_dumbbell_y         accel_dumbbell_z 
+                   FALSE                    FALSE 
+       magnet_dumbbell_x        magnet_dumbbell_y 
+                   FALSE                    FALSE 
+       magnet_dumbbell_z             roll_forearm 
+                   FALSE                    FALSE 
+           pitch_forearm              yaw_forearm 
+                   FALSE                    FALSE 
+       max_picth_forearm        min_pitch_forearm 
+                    TRUE                     TRUE 
+  amplitude_roll_forearm  amplitude_pitch_forearm 
+                    TRUE                     TRUE 
+     total_accel_forearm        var_accel_forearm 
+                   FALSE                     TRUE 
+         gyros_forearm_x          gyros_forearm_y 
+                   FALSE                    FALSE 
+         gyros_forearm_z          accel_forearm_x 
+                   FALSE                    FALSE 
+         accel_forearm_y          accel_forearm_z 
+                   FALSE                    FALSE 
+        magnet_forearm_x         magnet_forearm_y 
+                   FALSE                    FALSE 
+        magnet_forearm_z                   classe 
+                   FALSE                    FALSE 
+> TrainSet<-TrainSet[,AllNA==FALSE]
+> TestSet<-TestSet[,AllNA==FALSE]
+> dim(TrainSet)
+[1] 13737    59
+> dim(TestSet)
+[1] 5885   59
+> TrainSet <- TrainSet[, -(1:5)]
+> TestSet  <- TestSet[, -(1:5)]
+> dim(TrainSet)
+[1] 13737    54
+> dim(TestSet)
+[1] 5885   54
+> corrMatrix<- cor(TrainSet[,-54])
+> corrplot(corrMatrix,order="FPC",method="color", type="lower",tl.cex=0.8,tl.col=rgb(0,0,0))
+> set.seed(12345)
+> tcontrolRF<- trainControl(method = "cv", number = 3,verboseIter = FALSE)
+> modFitRandForest<- train(classe~ ., data=TrainSet,method="rf",trControl=tcontrolRF )
+> modFitRandForest$finalModel
+
+Call:
+ randomForest(x = x, y = y, mtry = param$mtry) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 27
+
+        OOB estimate of  error rate: 0.2%
+Confusion matrix:
+     A    B    C    D    E  class.error
+A 3904    1    0    0    1 0.0005120328
+B    5 2652    1    0    0 0.0022573363
+C    0    5 2390    1    0 0.0025041736
+D    0    0    7 2245    0 0.0031083481
+E    0    1    0    5 2519 0.0023762376
+> predictRandForest <- predict(modFitRandForest, newdata=TestSet)
+> predictRandForest
+   [1] A A A A A A A A A A A A A A A A A A A A A A A A
+  [25] A A A A A A A A A A A A A A A A A A A A A A A A
+  [49] A A A A A A A A A A A A A A A A A A A A A A A A
+  [73] A A A A A A A A A A A A A A A A A A A A A A A A
+  [97] A A A A A A A A A A A A A A A A A A A A A A A A
+ [121] A A A A A A A A A A A A A A A A A A A A A A A A
+ [145] A A A A A A A A A A A A A A A A A A A A A A A A
+ [169] A A A A A A A A A A A A A A A A A A A A A A A A
+ [193] A A A A A A A A A A A A A A A A A A A A A A A A
+ [217] A A A A A A A A A A A A A A A A A A A A A A A A
+ [241] A A A A A A A A A A A A A A A A A A A A A A A A
+ [265] A A A A A A A A A A A A A A A A A A A A A A A A
+ [289] A A A A A A A A A A A A A A A A A A A A A A A A
+ [313] A A A A A A A A A A A A A A A A A A A A A A A A
+ [337] A A A A A A A A A A A A A A A A A A A A A A A A
+ [361] A A A A A A A A A A A A A A A A A A A A A A A A
+ [385] A A A A A A A A A A A A A A A A A A A A A A A A
+ [409] A A A A A A A A A A A A A A A A A A A A A A A A
+ [433] A A A A A A A A A A A A A A A A A A A A A A A A
+ [457] A A A A A A A A A A A A A A A A A A A A A A A A
+ [481] A A A A A A A A A A A A A A A A A A A A A A A A
+ [505] A A A A A A A A A A A A A A A A A A A A A A A A
+ [529] A A A A A A A A A A A A A A A A A A A A A A A A
+ [553] A A A A A A A A A A A A A A A A A A A A A A A A
+ [577] A A A A A A A A A A A A A A A A A A A A A A A A
+ [601] A A A A A A A A A A A A A A A A A A A A A A A A
+ [625] A A A A A A A A A A A A A A A A A A A A A A A A
+ [649] A A A A A A A A A A A A A A A A A A A A A A A A
+ [673] A A A A A A A A A A A A A A A A A A A A A A A A
+ [697] A A A A A A A A A A A A A A A A A A A A A A A A
+ [721] A A A A A A A A A A A A A A A A A A A A A A A A
+ [745] A A A A A A A A A A A A A A A A A A A A A A A A
+ [769] A A A A A A A A A A A A A A A A A A A A A A A A
+ [793] A A A A A A A A A A A A A A A A A A A A A A A A
+ [817] A A A A A A A A A A A A A A A A A A A A A A A A
+ [841] A A A A A A A A A A A A A A A A A A A A A A A A
+ [865] A A A A A A A A A A A A A A A A A A A A A A A A
+ [889] A A A A A A A A A A A A A A A A A A A A A A A A
+ [913] A A A A A A A A A A A A A A A A A A A A A A A A
+ [937] A A A A A A A A A A A A A A A A A A A A A A A A
+ [961] A A A A A A A A A A A A A A A A A A A A A A A A
+ [985] A A A A A A A A A A A A A A A A
+ [ reached getOption("max.print") -- omitted 4885 entries ]
+Levels: A B C D E
+> confMatRandForest <- confusionMatrix(predictRandForest, TestSet$classe)
+> confMatRandForest
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 1674    5    0    0    0
+         B    0 1133    4    0    0
+         C    0    1 1022    8    0
+         D    0    0    0  956    3
+         E    0    0    0    0 1079
+
+Overall Statistics
+                                          
+               Accuracy : 0.9964          
+                 95% CI : (0.9946, 0.9978)
+    No Information Rate : 0.2845          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.9955          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: A Class: B
+Sensitivity            1.0000   0.9947
+Specificity            0.9988   0.9992
+Pos Pred Value         0.9970   0.9965
+Neg Pred Value         1.0000   0.9987
+Prevalence             0.2845   0.1935
+Detection Rate         0.2845   0.1925
+Detection Prevalence   0.2853   0.1932
+Balanced Accuracy      0.9994   0.9969
+                     Class: C Class: D
+Sensitivity            0.9961   0.9917
+Specificity            0.9981   0.9994
+Pos Pred Value         0.9913   0.9969
+Neg Pred Value         0.9992   0.9984
+Prevalence             0.1743   0.1638
+Detection Rate         0.1737   0.1624
+Detection Prevalence   0.1752   0.1630
+Balanced Accuracy      0.9971   0.9955
+                     Class: E
+Sensitivity            0.9972
+Specificity            1.0000
+Pos Pred Value         1.0000
+Neg Pred Value         0.9994
+Prevalence             0.1839
+Detection Rate         0.1833
+Detection Prevalence   0.1833
+Balanced Accuracy      0.9986
+> t
+function (x) 
+UseMethod("t")
+<bytecode: 0x00000000184a5f38>
+<environment: namespace:base>
+> set.seed(32165)
+> modFitDecTree <- rpart(classe ~ ., data=TrainSet, method="class")
+> fancyRpartPlot(modFitDecTree)
+Error: could not find function "fancyRpartPlot"
+> predictDecTree <- predict(modFitDecTree, newdata=TestSet, type="class")
+> confMatDecTree <- confusionMatrix(predictDecTree, TestSet$classe)
+> confMatDecTree
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 1530  269   51   79   16
+         B   35  575   31   25   68
+         C   17   73  743   68   84
+         D   39  146  130  702  128
+         E   53   76   71   90  786
+
+Overall Statistics
+                                         
+               Accuracy : 0.7368         
+                 95% CI : (0.7253, 0.748)
+    No Information Rate : 0.2845         
+    P-Value [Acc > NIR] : < 2.2e-16      
+                                         
+                  Kappa : 0.6656         
+ Mcnemar's Test P-Value : < 2.2e-16      
+
+Statistics by Class:
+
+                     Class: A Class: B
+Sensitivity            0.9140  0.50483
+Specificity            0.9014  0.96650
+Pos Pred Value         0.7866  0.78338
+Neg Pred Value         0.9635  0.89051
+Prevalence             0.2845  0.19354
+Detection Rate         0.2600  0.09771
+Detection Prevalence   0.3305  0.12472
+Balanced Accuracy      0.9077  0.73566
+                     Class: C Class: D
+Sensitivity            0.7242   0.7282
+Specificity            0.9502   0.9100
+Pos Pred Value         0.7543   0.6131
+Neg Pred Value         0.9422   0.9447
+Prevalence             0.1743   0.1638
+Detection Rate         0.1263   0.1193
+Detection Prevalence   0.1674   0.1946
+Balanced Accuracy      0.8372   0.8191
+                     Class: E
+Sensitivity            0.7264
+Specificity            0.9396
+Pos Pred Value         0.7305
+Neg Pred Value         0.9384
+Prevalence             0.1839
+Detection Rate         0.1336
+Detection Prevalence   0.1828
+Balanced Accuracy      0.8330
+> plot(confMatDecTree$table, col = confMatDecTree$byClass, 
++      main = paste("Decision Tree - Accuracy =",
++                   round(confMatDecTree$overall['Accuracy'], 4)))
+> set.seed(32165)
+> controlGBM <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
+> modFitGBM  <- train(classe ~ ., data=TrainSet, method = "gbm",
++                     trControl = controlGBM, verbose = FALSE)
+Loading required package: gbm
+Loading required package: survival
+
+Attaching package: ‘survival’
+
+The following object is masked from ‘package:caret’:
+
+    cluster
+
+Loading required package: splines
+Loading required package: parallel
+Error : .onAttach failed in attachNamespace() for 'gbm', details:
+  call: formatDL(nm, txt, indent = max(nchar(nm, "w")) + 3)
+  error: incorrect values of 'indent' and 'width'
+In addition: Warning messages:
+1: package ‘gbm’ was built under R version 3.3.3 
+2: package ‘survival’ was built under R version 3.3.3 
+Loading required package: plyr
+Error : .onAttach failed in attachNamespace() for 'gbm', details:
+  call: formatDL(nm, txt, indent = max(nchar(nm, "w")) + 3)
+  error: incorrect values of 'indent' and 'width'
+In addition: Warning messages:
+1: package ‘plyr’ was built under R version 3.3.3 
+2: package ‘gbm’ was built under R version 3.3.3 
+Error: package or namespace load failed for ‘gbm’
+> modFitGBM$finalModel
+Error: object 'modFitGBM' not found
+> predictGBM <- predict(modFitGBM, newdata=TestSet)
+Error in predict(modFitGBM, newdata = TestSet) : 
+  object 'modFitGBM' not found
+> confMatGBM <- confusionMatrix(predictGBM, TestSet$classe)
+Error in confusionMatrix(predictGBM, TestSet$classe) : 
+  object 'predictGBM' not found
+> confMatGBM
+Error: object 'confMatGBM' not found
+> plot(confMatGBM$table, col = confMatGBM$byClass, 
++      main = paste("GBM - Accuracy =", round(confMatGBM$overall['Accuracy'], 4)))
+Error in plot(confMatGBM$table, col = confMatGBM$byClass, main = paste("GBM - Accuracy =",  : 
+  object 'confMatGBM' not found

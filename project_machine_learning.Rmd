@@ -1,5 +1,7 @@
 
+
 #I imported all the necessary package to predect the manner the group of people did the excercice.
+'''
 rm(list=ls())
 library(knitr)
 library(caret)
@@ -9,6 +11,7 @@ library(rattle)
 library(randomForest)
 library(corrplot)
 set.seed(12345)
+'''
 #Then I uploaded data to my rstudio 
 UrlTrain <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
 UrlTest  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"

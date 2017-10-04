@@ -1,3 +1,4 @@
+
 #I imported all the necessary package to predect the manner the group of people did the excercice.
 rm(list=ls())
 library(knitr)
@@ -44,6 +45,7 @@ tcontrolRF<- trainControl(method = "cv", number = 3,verboseIter = FALSE)
 modFitRandForest<- train(classe~ ., data=TrainSet,method="rf",trControl=tcontrolRF )
 modFitRandForest$finalModel
 predictRandForest <- predict(modFitRandForest, newdata=TestSet)
+predictRandForest
 confMatRandForest <- confusionMatrix(predictRandForest, TestSet$classe)
 confMatRandForest
 # The accurancy here is 0.9964 .
@@ -52,6 +54,7 @@ set.seed(32165)
 modFitDecTree <- rpart(classe ~ ., data=TrainSet, method="class")
 fancyRpartPlot(modFitDecTree)
 predictDecTree <- predict(modFitDecTree, newdata=TestSet, type="class")
+predictDecTree
 confMatDecTree <- confusionMatrix(predictDecTree, TestSet$classe)
 confMatDecTree
 plot(confMatDecTree$table, col = confMatDecTree$byClass, 
@@ -65,6 +68,7 @@ modFitGBM  <- train(classe ~ ., data=TrainSet, method = "gbm",
                     trControl = controlGBM, verbose = FALSE)
 modFitGBM$finalModel
 predictGBM <- predict(modFitGBM, newdata=TestSet)
+predictGBM
 confMatGBM <- confusionMatrix(predictGBM, TestSet$classe)
 confMatGBM
 plot(confMatGBM$table, col = confMatGBM$byClass, 

@@ -47,6 +47,7 @@ corrplot(corrMatrix,order="FPC",method="color", type="lower",tl.cex=0.8,tl.col=r
 ```
 I will use prediction models now with three methods and the one with higher accurancy will be the chosen one.In order to visualise the accurancy I will use a plot of the confusion matrix
 # RANDOM FOREST MODEL
+
 ```{r}
 set.seed(12345)
 tcontrolRF<- trainControl(method = "cv", number = 3,verboseIter = FALSE)
@@ -70,7 +71,7 @@ confMatDecTree
 plot(confMatDecTree$table, col = confMatDecTree$byClass, 
      main = paste("Decision Tree - Accuracy =",
                   round(confMatDecTree$overall['Accuracy'], 4)))
-		  ```
+		```
 # The accurancy here is  0.7368 .
 # method3 :Genereliized Boosted Model
 ```{r}

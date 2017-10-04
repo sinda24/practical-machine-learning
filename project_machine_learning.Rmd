@@ -23,6 +23,7 @@ TrainSet<-training[inTrain,]
 TestSet<-training[-inTrain,]
 dim(TrainSet)
 dim(TestSet)
+
 NZV<- nearZeroVar(TrainSet)
 TrainSet<- TrainSet[,-NZV]
 TestSet<-TestSet[,-NZV]
@@ -71,7 +72,7 @@ confMatDecTree
 plot(confMatDecTree$table, col = confMatDecTree$byClass, 
      main = paste("Decision Tree - Accuracy =",
                   round(confMatDecTree$overall['Accuracy'], 4)))
-		```
+```
 # The accurancy here is  0.7368 .
 # method3 :Genereliized Boosted Model
 ```{r}
@@ -86,6 +87,6 @@ confMatGBM <- confusionMatrix(predictGBM, TestSet$classe)
 confMatGBM
 plot(confMatGBM$table, col = confMatGBM$byClass, 
      main = paste("GBM - Accuracy =", round(confMatGBM$overall['Accuracy'], 4)))
-     ```
-	 # The accurancy here is  0.9854 .
+```
+ # The accurancy here is  0.9854 .
  So I chose the first model using random forest model which has the higher accurancy with value of 0.9964

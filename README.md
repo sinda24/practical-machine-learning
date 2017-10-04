@@ -1,72 +1,14 @@
-# practical-machine-learning
-rm(list=ls())
-library(knitr)
-library(caret)
-library(rpart)
-library(rpart.plot)
-library(rattle)
-library(randomForest)
-library(corrplot)
-set.seed(12345)
-
-UrlTrain <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
-UrlTest  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
-training<-read.csv(url(UrlTrain))
-testing<- read.csv(url(UrlTest))
-inTrain <- createDataPartition(training$classe, p = 0.7, list = FALSE)
-TrainSet<-training[inTrain,]
-TestSet<-training[-inTrain,]
-dim(TrainSet)
-dim(TestSet)
-NZV<- nearZeroVar(TrainSet)
-TrainSet<- TrainSet[,-NZV]
-TestSet<-TestSet[,-NZV]
-dim(TrainSet)
-dim(TestSet)
-AllNA<- sapply(TrainSet,function(x)mean(is.na(x)))> 0.95
-TrainSet<-TrainSet[,AllNA==FALSE]
-TestSet<-TestSet[,AllNA==FALSE]
-dim(TrainSet)
-dim(TestSet)
-TrainSet <- TrainSet[, -(1:5)]
-TestSet  <- TestSet[, -(1:5)]
-dim(TrainSet)
-dim(TestSet)
-corrMatrix<- cor(TrainSet[,-54])
-corrplot(corrMatrix,order="FPC",method="color", type="lower",tl.cex=0.8,tl.col=rgb(0,0,0))
-#now we cleaned th data and saw how variables are correlated between each other
-# we will use prediction models now with three methods; 1- RANDOM FOREST, 2-DECISION TREE, 3-GENERALIZED BOOSTED MODEL.
-# we will make a plot of the confusion matrix to visualize the accurancy
-# method 1: RANDOM FOREST :
-set.seed(32165)
-controlRF<- trainControl(method = "cv", number = 3,verboseIter = FALSE)
-modFitRandForest<- train(classe~ ., data=TrainSet,method="rf",trControl=controlRF )
-modFitRandForest$finalModel
-predictRandForest <- predict(modFitRandForest, newdata=TestSet)
-confMatRandForest <- confusionMatrix(predictRandForest, TestSet$classe)
-confMatRandForest
-plot(confMatRandForest$table, col = confMatRandForest$byClass, 
-     main = paste("Random Forest - Accuracy =",
-                  round(confMatRandForest$overall['Accuracy'], 4)))
-# method2: decision tree
-set.seed(32165)
-modFitDecTree <- rpart(classe ~ ., data=TrainSet, method="class")
-fancyRpartPlot(modFitDecTree)
-predictDecTree <- predict(modFitDecTree, newdata=TestSet, type="class")
-confMatDecTree <- confusionMatrix(predictDecTree, TestSet$classe)
-confMatDecTree
-plot(confMatDecTree$table, col = confMatDecTree$byClass, 
-     main = paste("Decision Tree - Accuracy =",
-                  round(confMatDecTree$overall['Accuracy'], 4)))
-                  
-# method3 :Genereliized Boosted Model
-set.seed(32165)
-controlGBM <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
-modFitGBM  <- train(classe ~ ., data=TrainSet, method = "gbm",
-                    trControl = controlGBM, verbose = FALSE)
-modFitGBM$finalModel
-predictGBM <- predict(modFitGBM, newdata=TestSet)
-confMatGBM <- confusionMatrix(predictGBM, TestSet$classe)
-confMatGBM
-plot(confMatGBM$table, col = confMatGBM$byClass, 
-     main = paste("GBM - Accuracy =", round(confMatGBM$overall['Accuracy'], 4)))
+Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+Data
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+What you should submit
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+Your submission should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
+You should also apply your machine learning algorithm to the 20 test cases available in the test data above. Please submit your predictions in appropriate format to the programming assignment for automated grading. See the programming assignment for additional details.
+Reproducibility
+Due to security concerns with the exchange of R code, your code will not be run during the evaluation by your classmates. Please be sure that if they download the repo, they will be able to view the compiled HTML version of your analysis.
